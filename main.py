@@ -21,11 +21,7 @@ class Transaction(BaseModel):
 def predict(transaction: Transaction):
     input_data = [[
         transaction.distance_from_home,
-        transaction.distance_from_last_transaction,
         transaction.ratio_to_median_purchase_price,
-        transaction.repeat_retailer,
-        transaction.used_chip,
-        transaction.used_pin_number,
         transaction.online_order
     ]]
 
