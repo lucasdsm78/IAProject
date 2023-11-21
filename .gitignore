@@ -166,4 +166,5 @@ cython_debug/
 /.idea/misc.xml
 /.idea/modules.xml
 /*.csv
+/*.pkl
 /.idea/vcs.xml
