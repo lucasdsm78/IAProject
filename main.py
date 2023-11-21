@@ -5,8 +5,8 @@ from pydantic import BaseModel
 app = FastAPI()
 
 # Load the trained KNN model
-with open("logistic_regression_model.pkl", "rb") as model_file:
-    knn_model = pickle.load(model_file)
+with open("random_forest_model.pkl", "rb") as model_file:
+    random_forest_model = pickle.load(model_file)
 
 class Transaction(BaseModel):
     distance_from_home: float
@@ -25,7 +25,7 @@ def predict(transaction: Transaction):
         transaction.online_order
     ]]
 
-    prediction = knn_model.predict(input_data)
+    prediction = random_forest_model.predict(input_data)
     print(prediction)
 
     return {"fraud_prediction": bool(int(prediction))}
