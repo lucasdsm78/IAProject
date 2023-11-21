@@ -1,12 +1,20 @@
+import os
 import pickle
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
+from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Load the trained KNN model
-with open("random_forest_model.pkl", "rb") as model_file:
-    random_forest_model = pickle.load(model_file)
+origins = ["http://localhost:3000/"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=[""],
+    allow_headers=[""],
+)
+
 
 class Transaction(BaseModel):
     distance_from_home: float
@@ -25,10 +33,26 @@ def predict(transaction: Transaction):
         transaction.online_order
     ]]
 
-    prediction = random_forest_model.predict(input_data)
-    print(prediction)
+    model_file_path = "random_forest_model.pkl"
+    if os.path.exists(model_file_path):
+        # Load the trained model
+        with open("random_forest_model.pkl", "rb") as model_file:
+            random_forest_model = pickle.load(model_file)
 
-    return {"fraud_prediction": bool(int(prediction))}
+        prediction = random_forest_model.predict(input_data)
+        print(prediction)
+
+        return {"fraud_prediction": bool(int(prediction))}
+    else:
+        return {"fraud_prediction": "No Model found, please try to upload one"}
+
+
+@app.post("/uploadModel")
+async def create_upload_file(file: UploadFile = File(...)):
+    file_path = os.path.join(os.getcwd(), file.filename)
+    with open(file_path, "wb") as file_object:
+        file_object.write(file.file.read())
+    return {"filename": file.filename, "file_path": file_path}
 
 
 @app.get("/")
