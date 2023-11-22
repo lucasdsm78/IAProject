@@ -1,3 +1,6 @@
+import codecs
+import csv
+import pandas as pd
 import os
 import pickle
 from fastapi import FastAPI, UploadFile, File
@@ -44,15 +47,13 @@ def predict(transaction: Transaction):
 
         return {"fraud_prediction": bool(int(prediction))}
     else:
-        return {"fraud_prediction": "No Model found, please try to upload one"}
+        return {"fraud_prediction": "No Model found, please try to train one"}
 
 
 @app.post("/uploadModel")
-async def create_upload_file(file: UploadFile = File(...)):
-    file_path = os.path.join(os.getcwd(), file.filename)
-    with open(file_path, "wb") as file_object:
-        file_object.write(file.file.read())
-    return {"filename": file.filename, "file_path": file_path}
+async def create_model(file: UploadFile = File(...)):
+    return {"filename": file.filename, "message": "File uploaded successfully"}
+
 
 
 @app.get("/")
